@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xtractor</title>
+    {% load static %}
+
+    <!-- bootstrap@5.3.2 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+         
+    <link rel="stylesheet" href="{% static 'Xtract.css' %}">
+</head>
+<body>
+    <div class="container-fluid p-0 m-0" style="height: 100vh; width: 100vw;overflow: hidden;">
+        <section id="splash-screen">
+            <video class="video-bg" playsinline autoplay muted loop>
+                <source src="{% static '/assets/Desktop.webm' %}" type="video/webm" />
+            </video>
+            <img src="{% static '/assets/Group 220078.svg' %}" style="position: absolute;top: 40%;left: 43%;">
+        </section>
+
+        <div id="initial-page" class="row p-0 m-0" style="display: none; height: 100%;">
+             <div class="d-flex flex-wrap justify-content-start align-items-center px-4" style="width: 100%; height: 8%;">
+                <img src="{% static '/assets/Group 220057.svg' %}" width="60px">
+             </div>
+
+             <div class="d-flex flex-wrap justify-content-start align-items-center" style="width: 100%; height: 6%; background: #0E4DE0;">
+                <p id="back" class="mb-0 px-3" style="display:none;color: #fff;font-size: 12px;cursor: pointer;" onclick="handleCancle()">Back to upload</p>
+             </div>
+
+             <div class="row p-0 m-0" style="height: 78%;">
+                <div class="col-6 p-0 m-0 d-flex flex-wrap justify-content-center align-items-center">
+                    <div id="empty-pdf" class="text-center flex-wrap justify-content-center" style="display: flex;">
+                        <img class="mb-2" src="{% static '/assets/Group 220073.svg' %}">
+                        <p style="width: 100%;color: #7E8081;font-size: 14px;">No file added to preview</p>
+                    </div>
+                    <div id="pdfViewer" style="height: 100%;width: 100%;display: none;"></div>
+                </div>
+                <div class="col-6 p-0 m-0 d-flex flex-wrap justify-content-center align-items-center" style="background: #EEF2F6;">
+                    <div id="upload-section" class="flex-wrap justify-content-center align-items-center" style="display: flex;height: 80%;width: 80%;background: #fff;border-radius: 5px;">
+                        <div id="file-upload-div" class="dash-box flex-wrap justify-content-center align-items-center" style="display: flex;">
+                        <div id="drop-area" class="flex-wrap justify-content-center align-items-center">
+                            <img class="mb-3" src="{% static '/assets/Group 165851.svg' %}">
+                            <h1 style="font-size: 14px;font-weight: 700;width: 100%;">Drag & Drop Your Files Here</h1>
+                            <p style="font-size: 12px;color: #A09FA1;font-weight: 500;width: 100%;">Supports jpg, png, tiff & pdf</p>
+                            <input type="file" id="fileInput" style="display: none;">
+                            <button class="blueButton" id="browseButton">Browse Files</button>
+                        </div>
+                        </div>
+                        <div id="file-details-div" class="flex-wrap justify-content-center align-items-center" style="display: none;position: relative;height: 100%;width: 100%;">
+                            <img src="{% static '/assets/Close.svg' %}" style="position: absolute;top: 15px;right: 15px; z-index: 999;cursor: pointer;" width="16" onclick="handleCancle()">
+                          <div id="file-details" class="flex-wrap justify-content-center" style="display: none;">
+                            <img class="mb-3" src="{% static '/assets/pdf-svgrepo-com.svg' %}">
+                            <p class="text-center justify-content-center mb-2" id="fileInfo" style="font-size: 14px;font-weight: 700;width: 100%;"></p>
+                            <p class="text-center" id="fileSize" style="font-size: 12px;color: #A09FA1;width: 100%;"></p>
+                            <div id="loader" class="justify-content-between align-items-center" style="font-size: 13px;color: #0E4DE0;display: none;"><span class="loader me-2"></span>Xtracting</div>
+                            <button class="blueButton" style="padding: 8px 20px 12px 20px;" type="button" onclick="XtractData()"><img src="{% static '/assets/Group 220077.svg' %}" width="40"></button>
+                          </div>
+                        </div>
+                    </div>
+                    <div id="table-data" class="flex-wrap" style="display: none;height: 100%;background: #fff;">
+                        <div class="d-flex justify-content-start align-items-center px-3" style="height: 10%;width: 100%;background: #fff;font-weight: 600;font-size: 13px;">
+                            Extracted Values
+                        </div>
+                        <div style="height: 84%;width: 100%;">
+                        <table id="data-table" class="table table-striped mb-0" style="border-left: 3px solid #fff;">
+                            <tbody id="table-body">
+                              <!-- Table content will be added here dynamically -->
+                            </tbody>
+                        </table>
+                        </div>
+                        <div class="d-flex justify-content-start align-items-center px-3" style="height: 6%;width: 100%;background: #E7E7E7;font-weight: 600;font-size: 10px;">
+                            <p class="mb-0" style="color: #053C77;">Extract generated: 14 Dec 2023</p>
+                        </div>
+                    </div>
+                </div>
+             </div>
+
+             <div class="d-flex flex-wrap justify-content-center align-items-center px-4" style="height: 8%;border-top: 1px solid #d5d5d5;">
+                <p class="text-end mb-0" style="font-size: 12px; width: 100%;color: #9e9c9c;">© 2023 All rights reserved by <img src="{% static '/assets/Group 220075.svg' %}" width="70"></p>
+             </div>
+        </div>
+    </div>
+
+
+    <script src="{% static 'script.js' %}"></script>
+</body>
+</html>
